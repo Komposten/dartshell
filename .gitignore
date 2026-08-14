@@ -1,0 +1,8 @@
+# Dart
+.dart_tool/
+pubspec.lock
+
+# Other
+local/
+output/
+build/
