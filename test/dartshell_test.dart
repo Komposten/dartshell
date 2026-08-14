@@ -54,7 +54,7 @@ void main() {
         expect(await run(scriptFile.path, const ['first', 'second']), 2);
         expect(
           await buildFile.readAsString(),
-          contains('Process.run(cmd, args)'),
+          contains('Process.start(cmd, args)'),
         );
 
         final initialBuildModified = await buildFile.lastModified();

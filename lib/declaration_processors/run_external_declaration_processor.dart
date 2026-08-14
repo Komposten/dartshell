@@ -31,15 +31,27 @@ class RunExternalDeclarationProcessor implements ExternalDeclarationProcessor {
   @override
   String implementationFor(FunctionDeclaration declaration) {
     return '''Future<String> run(String cmd, [List<String> args = const []]) async {
-  final result = await Process.run(cmd, args);
-  stdout.write(result.stdout);
-  stderr.write(result.stderr);
+  final process = await Process.start(cmd, args);
+  final stdoutBytes = <int>[];
+  final stderrBytes = <int>[];
 
-  if (result.exitCode != 0) {
-    throw ProcessException(cmd, args, result.stderr.toString(), result.exitCode);
+  final stdoutDone = process.stdout.listen((output) {
+    stdout.add(output);
+    stdoutBytes.addAll(output);
+  }).asFuture<void>();
+  final stderrDone = process.stderr.listen((output) {
+    stderr.add(output);
+    stderrBytes.addAll(output);
+  }).asFuture<void>();
+
+  final results = await Future.wait([process.exitCode, stdoutDone, stderrDone]);
+  final exitCode = results.first as int;
+
+  if (exitCode != 0) {
+    throw ProcessException(cmd, args, systemEncoding.decode(stderrBytes), exitCode);
   }
 
-  return result.stdout as String;
+  return systemEncoding.decode(stdoutBytes);
 }''';
   }
 }
