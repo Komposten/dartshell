@@ -3,6 +3,9 @@ description: Easily write and run shell-like scripts with dart.
 version: 1.0.0
 repository: https://github.com/komposten/dartshell
 
+executables:
+  dartshell:
+
 environment:
   sdk: ^3.12.2
 
