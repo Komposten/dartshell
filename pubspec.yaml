@@ -1,6 +1,6 @@
 name: dartshell
 description: Easily write and run shell-like scripts with dart.
-version: 1.0.0
+version: 0.1.0
 repository: https://github.com/komposten/dartshell
 
 executables:
