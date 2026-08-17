@@ -3,25 +3,20 @@ import 'package:dartshell/declaration_processors/return_type.dart';
 
 import 'external_declaration_processor.dart';
 
-/// Implements the shell command declaration:
-///
-/// ```dart
-/// external Future<String> run(String cmd, [List<String> args]);
-/// ```
-class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
+class RunSilentExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   static final _signatures = {
     ReturnType.stdout: [
-      Signature.withPositional('Future<String>', 'run', 'String cmd', 'List<String> args'),
+      Signature.withPositional('Future<String>', 'runSilent', 'String cmd', 'List<String> args'),
     ],
     ReturnType.stdoutStderr: [
-      Signature.withPositional('Future<(String, String)>', 'run', 'String cmd', 'List<String> args'),
+      Signature.withPositional('Future<(String, String)>', 'runSilent', 'String cmd', 'List<String> args'),
     ],
   };
 
-  const RunExternalDeclarationProcessor() : super(true);
+  const RunSilentExternalDeclarationProcessor() : super(true);
 
   @override
-  String get description => "Run the specified command. The command's stdout and stderr are echoed. The return value contains stdout (and stderr, for the record version).";
+  String get description => "Run the specified command. The command's stderr is echoed. The return value contains stdout (and stderr, for the record version).";
 
   @override
   List<Signature> signatures() => _signatures.values.expand((e) => e).toList();
@@ -39,7 +34,6 @@ class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   final stderrBytes = <int>[];
 
   final stdoutDone = process.stdout.listen((output) {
-    stdout.add(output);
     stdoutBytes.addAll(output);
   }).asFuture<void>();
   final stderrDone = process.stderr.listen((output) {

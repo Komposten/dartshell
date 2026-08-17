@@ -1,0 +1,4 @@
+enum ReturnType {
+  stdout,
+  stdoutStderr
+}

@@ -3,6 +3,21 @@ import 'package:dartshell/bool_extensions.dart';
 import 'package:dartshell/script_preprocessor.dart';
 import 'package:path/path.dart' as path;
 
+/// Returns every built-in external declaration signature, grouped by name.
+///
+/// The order mirrors the processor and signature registration order.
+List<({String name, String description, List<Signature> signatures})> availableExternalSignatures() {
+  final signaturesByName = <String, (String, List<Signature>)>{};
+
+  for (final processor in defaultExternalDeclarationProcessors) {
+    for (final signature in processor.signatures()) {
+      signaturesByName.putIfAbsent(signature.name, () => (processor.description, [])).$2.add(signature);
+    }
+  }
+
+  return List.unmodifiable(signaturesByName.entries.map((e) => (name: e.key, description: e.value.$1, signatures: e.value.$2)));
+}
+
 Future<int> run(String scriptPath, List<String> args, {bool verbose = false}) async {
   final scriptFile = File(scriptPath);
   if (!await scriptFile.exists() || (await scriptFile.stat()).type != FileSystemEntityType.file) {
@@ -21,7 +36,7 @@ Future<int> run(String scriptPath, List<String> args, {bool verbose = false}) as
 
     verbose.ifTrue(() => print('Compiling $buildPath to $binPath'));
     await binDir.create(recursive: true);
-    final compilation = await Process.run('dart', ['compile', 'exe', buildPath, '--output', '$binPath']);
+    final compilation = await Process.run('dart', ['compile', 'exe', buildPath, '--output', binPath]);
     if (compilation.exitCode != 0) {
       throw 'Failed to compile Dart script: ${compilation.stderr}';
     }

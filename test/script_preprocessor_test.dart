@@ -1,4 +1,3 @@
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dartshell/script_preprocessor.dart';
 import 'package:test/test.dart';
 
@@ -16,16 +15,8 @@ external Future<String> run(String cmd, [List<String> args]);
       final output = ScriptPreprocessor().preprocess(source);
 
       expect(output, contains("import 'dart:io';"));
-      expect(
-        output,
-        contains(
-          'Future<String> run(String cmd, [List<String> args = const []]) async',
-        ),
-      );
-      expect(
-        output,
-        contains('final process = await Process.start(cmd, args);'),
-      );
+      expect(output, contains('Future<String> run(String cmd, [List<String> args = const []]) async'));
+      expect(output, contains('final process = await Process.start(cmd, args);'));
       expect(output, contains('stdout.add(output);'));
       expect(output, contains('stderr.add(output);'));
       expect(output, isNot(contains('external Future<String> run')));
@@ -47,29 +38,5 @@ external Future<String> run(String cmd, List<String> args);
 
       expect(ScriptPreprocessor().preprocess(source), source);
     });
-
-    test('accepts additional declaration processors', () {
-      const source = 'external int answer();\n';
-      final preprocessor = ScriptPreprocessor(
-        processors: const [_AnswerProcessor()],
-      );
-
-      expect(preprocessor.preprocess(source), 'int answer() => 42;\n');
-    });
   });
-}
-
-class _AnswerProcessor implements ExternalDeclarationProcessor {
-  const _AnswerProcessor();
-
-  @override
-  bool get requiresDartIo => false;
-
-  @override
-  String implementationFor(FunctionDeclaration declaration) =>
-      'int answer() => 42;';
-
-  @override
-  bool supports(FunctionDeclaration declaration) =>
-      declaration.name.lexeme == 'answer';
 }

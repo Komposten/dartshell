@@ -66,13 +66,9 @@ chmod +x check_changes.dart
      
    }
    ```
-2. Define one of Dartshell's `external` functions at the end of the file:
-   - `run`: Runs `cmd` with the specified arguments
-     - `external Future<String> run(String cmd, List<String> args);`
-     - `external Future<String> run(String cmd, [List<String> args]);`
+2. Define one of Dartshell's `external` functions at the end of the file.
+   Run `dartshell --signatures` to get a complete list of supported signatures.
 3. Add your script code, calling the `external` functions like any normal Dart functions.
-
-Write your Dart
 
 ## How it works
 On its first run, Dartshell expands the `external` declaration, compiles the expanded script, and executes the resulting binary.

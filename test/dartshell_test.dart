@@ -5,6 +5,18 @@ import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
 void main() {
+  group('availableExternalSignatures', () {
+    test('groups every built-in signature by function name', () {
+      final signaturesByName = availableExternalSignatures();
+
+      expect(signaturesByName.map((s) => s.name), ['run', 'runSilent']);
+      expect(signaturesByName.where((s) => s.name == 'run').expand((e) => e.signatures).map((signature) => signature.toString()), [
+        'Future<String> run(String cmd, [List<String> args])',
+        'Future<(String, String)> run(String cmd, [List<String> args])',
+      ]);
+    });
+  });
+
   group('run', () {
     late Directory scriptDirectory;
     late File scriptFile;
