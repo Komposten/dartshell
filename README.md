@@ -6,6 +6,8 @@ Dartshell makes it easy to compose Dart scripts that call external cli tools. Wr
 
 Supports all major platforms.
 
+<sub>**AI disclaimer:** GPT-5.6 Terra generated large portions of this code. It has been audited, tested and partly rewritten by me (@Komposten).</sub>
+
 ## Requirements
 
 - Dart SDK `^3.12.2`
@@ -66,7 +68,7 @@ chmod +x check_changes.dart
      
    }
    ```
-2. Define one of Dartshell's `external` functions at the end of the file.
+2. Define one of Dartshell's `external` functions at the end of the file.\
    Run `dartshell --signatures` to get a complete list of supported signatures.
 3. Add your script code, calling the `external` functions like any normal Dart functions.
 
