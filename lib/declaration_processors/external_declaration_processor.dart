@@ -15,7 +15,8 @@ abstract class ExternalDeclarationProcessor {
 
   /// Whether this processor owns [declaration]'s signature.
   @nonVirtual
-  bool supports(FunctionDeclaration declaration) => signatures().any((signature) => signature.matches(declaration));
+  bool supports(FunctionDeclaration declaration) =>
+      signatures().any((signature) => signature.matches(declaration));
 
   /// The implementation that replaces [declaration].
   String implementationFor(FunctionDeclaration declaration);
@@ -33,19 +34,35 @@ class Signature {
   Signature(String returnType, String name, String? requiredParameters)
     : this._(returnType, name, requiredParameters, null, null);
 
-  Signature.withPositional(String returnType, String name, String? requiredParameters, String? positionalParameters)
-    : this._(returnType, name, requiredParameters, positionalParameters, null);
+  Signature.withPositional(
+    String returnType,
+    String name,
+    String? requiredParameters,
+    String? positionalParameters,
+  ) : this._(returnType, name, requiredParameters, positionalParameters, null);
 
-  Signature.withNamed(String returnType, String name, String? requiredParameters, String? namedParameters)
-    : this._(returnType, name, requiredParameters, null, namedParameters);
+  Signature.withNamed(
+    String returnType,
+    String name,
+    String? requiredParameters,
+    String? namedParameters,
+  ) : this._(returnType, name, requiredParameters, null, namedParameters);
 
-  Signature._(this.returnType, this.name, this.requiredParameters, this.positionalParameters, this.namedParameters) {
+  Signature._(
+    this.returnType,
+    this.name,
+    this.requiredParameters,
+    this.positionalParameters,
+    this.namedParameters,
+  ) {
     final bool hasRequired = requiredParameters != null;
     final bool hasPositional = positionalParameters != null;
     final bool hasNamed = namedParameters != null;
 
     if (hasPositional && hasNamed) {
-      throw ArgumentError('Both positional and named parameters cannot be specified');
+      throw ArgumentError(
+        'Both positional and named parameters cannot be specified',
+      );
     }
 
     List<String> parameterLists;
@@ -57,7 +74,11 @@ class Signature {
         '($requiredParameters)',
       ];
     } else {
-      parameterLists = [if (hasPositional) '([$positionalParameters])', if (hasNamed) '({$namedParameters})', ''];
+      parameterLists = [
+        if (hasPositional) '([$positionalParameters])',
+        if (hasNamed) '({$namedParameters})',
+        '',
+      ];
     }
 
     parameterList = parameterLists.first;
@@ -67,14 +88,17 @@ class Signature {
   bool matches(FunctionDeclaration declaration) =>
       declaration.returnType?.toSource() == returnType &&
       declaration.name.lexeme == name &&
-      _matchesParameterList(declaration.functionExpression.parameters?.toSource() ?? '');
+      _matchesParameterList(
+        declaration.functionExpression.parameters?.toSource() ?? '',
+      );
 
   bool _matchesParameterList(String parameters) {
     var compact = _compact(parameters);
     return _compactParameterLists.any((e) => compact == e);
   }
 
-  String _compact(String parameters) => parameters.replaceAll(RegExp(r'\s+'), '');
+  String _compact(String parameters) =>
+      parameters.replaceAll(RegExp(r'\s+'), '');
 
   @override
   String toString() => '$returnType $name$parameterList';

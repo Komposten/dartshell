@@ -11,24 +11,40 @@ import 'external_declaration_processor.dart';
 class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   static final _signatures = {
     ReturnType.stdout: [
-      Signature.withPositional('Future<String>', 'run', 'String cmd', 'List<String> args'),
+      Signature.withPositional(
+        'Future<String>',
+        'run',
+        'String cmd',
+        'List<String> args',
+      ),
     ],
     ReturnType.stdoutStderr: [
-      Signature.withPositional('Future<(String, String)>', 'run', 'String cmd', 'List<String> args'),
+      Signature.withPositional(
+        'Future<(String, String)>',
+        'run',
+        'String cmd',
+        'List<String> args',
+      ),
     ],
   };
 
   const RunExternalDeclarationProcessor() : super(true);
 
   @override
-  String get description => "Run the specified command. The command's stdout and stderr are echoed. The return value contains stdout (and stderr, for the record version).";
+  String get description =>
+      "Run the specified command. The command's stdout and stderr are echoed. The return value contains stdout (and stderr, for the record version).";
 
   @override
   List<Signature> signatures() => _signatures.values.expand((e) => e).toList();
 
   @override
   String implementationFor(FunctionDeclaration declaration) {
-    final entry = _signatures.entries.where((entry) => entry.value.any((signature) => signature.matches(declaration))).first;
+    final entry = _signatures.entries
+        .where(
+          (entry) =>
+              entry.value.any((signature) => signature.matches(declaration)),
+        )
+        .first;
     final returnType = entry.key == ReturnType.stdout
         ? 'systemEncoding.decode(stdoutBytes)'
         : '(systemEncoding.decode(stdoutBytes), systemEncoding.decode(stderrBytes))';

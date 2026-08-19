@@ -1,4 +1,1 @@
-enum ReturnType {
-  stdout,
-  stdoutStderr
-}
+enum ReturnType { stdout, stdoutStderr }

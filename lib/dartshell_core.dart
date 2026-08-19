@@ -6,27 +6,45 @@ import 'package:path/path.dart' as path;
 /// Returns every built-in external declaration signature, grouped by name.
 ///
 /// The order mirrors the processor and signature registration order.
-List<({String name, String description, List<Signature> signatures})> availableExternalSignatures() {
+List<({String name, String description, List<Signature> signatures})>
+availableExternalSignatures() {
   final signaturesByName = <String, (String, List<Signature>)>{};
 
   for (final processor in defaultExternalDeclarationProcessors) {
     for (final signature in processor.signatures()) {
-      signaturesByName.putIfAbsent(signature.name, () => (processor.description, [])).$2.add(signature);
+      signaturesByName
+          .putIfAbsent(signature.name, () => (processor.description, []))
+          .$2
+          .add(signature);
     }
   }
 
-  return List.unmodifiable(signaturesByName.entries.map((e) => (name: e.key, description: e.value.$1, signatures: e.value.$2)));
+  return List.unmodifiable(
+    signaturesByName.entries.map(
+      (e) => (name: e.key, description: e.value.$1, signatures: e.value.$2),
+    ),
+  );
 }
 
-Future<int> run(String scriptPath, List<String> args, {bool verbose = false}) async {
+Future<int> run(
+  String scriptPath,
+  List<String> args, {
+  bool verbose = false,
+}) async {
   final scriptFile = File(scriptPath);
-  if (!await scriptFile.exists() || (await scriptFile.stat()).type != FileSystemEntityType.file) {
+  if (!await scriptFile.exists() ||
+      (await scriptFile.stat()).type != FileSystemEntityType.file) {
     throw '$scriptPath does not exist or is not a file';
   }
 
-  final buildDir = Directory(path.join(Directory.systemTemp.path, 'dartshell', 'build'));
-  final binDir = Directory(path.join(Directory.systemTemp.path, 'dartshell', 'bin'));
-  final buildName = '${path.basename(scriptPath)}-${scriptFile.absolute.path.hashCode}';
+  final buildDir = Directory(
+    path.join(Directory.systemTemp.path, 'dartshell', 'build'),
+  );
+  final binDir = Directory(
+    path.join(Directory.systemTemp.path, 'dartshell', 'bin'),
+  );
+  final buildName =
+      '${path.basename(scriptPath)}-${scriptFile.absolute.path.hashCode}';
   final buildPath = path.join(buildDir.path, buildName);
   final binPath = path.join(binDir.path, buildName);
 
@@ -36,7 +54,13 @@ Future<int> run(String scriptPath, List<String> args, {bool verbose = false}) as
 
     verbose.ifTrue(() => print('Compiling $buildPath to $binPath'));
     await binDir.create(recursive: true);
-    final compilation = await Process.run('dart', ['compile', 'exe', buildPath, '--output', binPath]);
+    final compilation = await Process.run('dart', [
+      'compile',
+      'exe',
+      buildPath,
+      '--output',
+      binPath,
+    ]);
     if (compilation.exitCode != 0) {
       throw 'Failed to compile Dart script: ${compilation.stderr}';
     }
@@ -44,7 +68,11 @@ Future<int> run(String scriptPath, List<String> args, {bool verbose = false}) as
 
   verbose.ifTrue(() => print('Executing command: $binPath ${args.join(' ')}'));
 
-  final execution = await Process.start(binPath, args, mode: ProcessStartMode.inheritStdio);
+  final execution = await Process.start(
+    binPath,
+    args,
+    mode: ProcessStartMode.inheritStdio,
+  );
   final exitCode = await execution.exitCode;
 
   verbose.ifTrue(() => print('Command exited with code $exitCode'));
