@@ -10,10 +10,67 @@ void main() {
       final signaturesByName = availableExternalSignatures();
 
       expect(signaturesByName.map((s) => s.name), ['run', 'runSilent']);
-      expect(signaturesByName.where((s) => s.name == 'run').expand((e) => e.signatures).map((signature) => signature.toString()), [
-        'Future<String> run(String cmd, [List<String> args])',
-        'Future<(String, String)> run(String cmd, [List<String> args])',
-      ]);
+      expect(
+        signaturesByName
+            .where((s) => s.name == 'run')
+            .expand((e) => e.signatures)
+            .map((signature) => signature.toString()),
+        [
+          'Future<String> run(String cmd, [List<String> args])',
+          'Future<(String, String)> run(String cmd, [List<String> args])',
+        ],
+      );
+    });
+  });
+
+  group('dartshell --new', () {
+    late Directory scriptDirectory;
+
+    setUp(() async {
+      scriptDirectory = await Directory.systemTemp.createTemp(
+        'dartshell_new_test_',
+      );
+    });
+
+    tearDown(() async {
+      await scriptDirectory.delete(recursive: true);
+    });
+
+    test(
+      'creates a template with every available external declaration',
+      () async {
+        final scriptPath = path.join(scriptDirectory.path, 'script.dart');
+
+        final result = await _runDartshell(['--new', scriptPath]);
+
+        expect(result.exitCode, 0, reason: result.stderr);
+        final script = await File(scriptPath).readAsString();
+        expect(
+          script,
+          startsWith('''#!/usr/bin/env dartshell
+
+void main() {
+  // Script code here.
+  // You may use all available Dart features.
+}
+
+// Dartshell function declarations; uncomment the ones you need
+'''),
+        );
+        for (final entry in availableExternalSignatures()) {
+          expect(script, contains('// ${entry.name}: ${entry.description}'));
+          for (final signature in entry.signatures) {
+            expect(script, contains('// external $signature;'));
+          }
+        }
+      },
+    );
+
+    test('rejects a directory path', () async {
+      final result = await _runDartshell(['--new', scriptDirectory.path]);
+
+      expect(result.exitCode, 1);
+      expect(result.stderr, contains('${scriptDirectory.path} is a directory'));
     });
   });
 
@@ -82,6 +139,12 @@ void main() {
     );
   });
 }
+
+Future<ProcessResult> _runDartshell(List<String> args) => Process.run(
+  Platform.resolvedExecutable,
+  ['run', 'bin/dartshell.dart', ...args],
+  workingDirectory: Directory.current.path,
+);
 
 const _scriptThatExitsWithArgumentCount = '''
 import 'dart:io';

@@ -60,7 +60,9 @@ chmod +x check_changes.dart
 ```
 
 ### Step-by-step
-1. Create a new Dart file:
+1. Create a new Dart file.
+   - Run `dartshell --new <dart-file>` to create a Dart file pre-populated with a shebang, empty `main()` and a list of all Dartshell's `external` functions commented out at the end of the file. 
+   - Or create a file manually with the following base content:
    ```dart
    #!/usr/bin/env dartshell
    
@@ -68,7 +70,7 @@ chmod +x check_changes.dart
      
    }
    ```
-2. Define one of Dartshell's `external` functions at the end of the file.\
+   In this case you have to manually define the `external` functions you want to use.\
    Run `dartshell --signatures` to get a complete list of supported signatures.
 3. Add your script code, calling the `external` functions like any normal Dart functions.
 
