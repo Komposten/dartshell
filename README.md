@@ -27,7 +27,7 @@ dartshell --help
 #!/usr/bin/env dartshell
 
 // check_changes.dart, checks if any dart files have been changed in the repo
-Future<void> main(List<String> args) async {
+void main(List<String> args) async {
   final output = await run('git', ['status', '--short', ...args]);
   final files = output
       .split('\n')
@@ -66,7 +66,7 @@ chmod +x check_changes.dart
    ```dart
    #!/usr/bin/env dartshell
    
-   void main(List<String> args) {
+   void main(List<String> args) async {
      
    }
    ```

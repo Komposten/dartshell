@@ -166,7 +166,7 @@ Future<void> _createScript(String scriptPath) async {
 String _newScriptTemplate() {
   final template = StringBuffer('''#!/usr/bin/env dartshell
 
-void main() {
+void main(List<String> args) async {
   // Script code here.
   // You may use all available Dart features.
 }

@@ -49,7 +49,7 @@ void main() {
           script,
           startsWith('''#!/usr/bin/env dartshell
 
-void main() {
+void main(List<String> args) async {
   // Script code here.
   // You may use all available Dart features.
 }
@@ -149,7 +149,7 @@ Future<ProcessResult> _runDartshell(List<String> args) => Process.run(
 const _scriptThatExitsWithArgumentCount = '''
 import 'dart:io';
 
-void main(List<String> args) {
+void main(List<String> args) async {
   exit(args.length);
 }
 
@@ -159,7 +159,7 @@ external Future<String> run(String cmd, [List<String> args]);
 const _scriptThatAlwaysExitsWithThree = '''
 import 'dart:io';
 
-void main(List<String> args) {
+void main(List<String> args) async {
   exit(3);
 }
 
