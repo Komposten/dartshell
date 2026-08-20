@@ -45,7 +45,7 @@ class RunSilentExternalDeclarationProcessor
         ? 'systemEncoding.decode(stdoutBytes)'
         : '(systemEncoding.decode(stdoutBytes), systemEncoding.decode(stderrBytes))';
 
-    return '''Future<String> run(String cmd, [List<String> args = const []]) async {
+    return '''Future<String> runSilent(String cmd, [List<String> args = const []]) async {
   final process = await Process.start(cmd, args);
   final stdoutBytes = <int>[];
   final stderrBytes = <int>[];
