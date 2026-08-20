@@ -30,6 +30,44 @@ external Future<String> run(String cmd, [List<String> args]);
       expect(output, isNot(contains('external Future<String> run')));
     });
 
+    test('implements record-returning run declarations', () {
+      const source = '''external Future<(String, String)> run(
+  String cmd,
+  [List<String> args]
+);
+
+external Future<(String, String)> runSilent(
+  String cmd,
+  [List<String> args]
+);
+''';
+
+      final output = ScriptPreprocessor().preprocess(source);
+
+      expect(
+        output,
+        contains(
+          'Future<(String, String)> run(String cmd, '
+          '[List<String> args = const []]) async',
+        ),
+      );
+      expect(
+        output,
+        contains(
+          'Future<(String, String)> runSilent(String cmd, '
+          '[List<String> args = const []]) async',
+        ),
+      );
+      expect(
+        RegExp(
+          r'return \(systemEncoding\.decode\(stdoutBytes\), '
+          r'systemEncoding\.decode\(stderrBytes\)\);',
+        ).allMatches(output),
+        hasLength(2),
+      );
+      expect(output, isNot(contains('external Future<(String, String)>')));
+    });
+
     test('does not add dart:io when it is already imported', () {
       const source = '''import 'dart:io';
 

@@ -1,4 +1,3 @@
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dartshell/declaration_processors/return_type.dart';
 
 import 'external_declaration_processor.dart';
@@ -8,7 +7,7 @@ class RunSilentExternalDeclarationProcessor
   static final _signatures = {
     ReturnType.stdout: [
       Signature.withPositional(
-        'Future<String>',
+        ReturnType.stdout.signature,
         'runSilent',
         'String cmd',
         'List<String> args',
@@ -16,7 +15,7 @@ class RunSilentExternalDeclarationProcessor
     ],
     ReturnType.stdoutStderr: [
       Signature.withPositional(
-        'Future<(String, String)>',
+        ReturnType.stdoutStderr.signature,
         'runSilent',
         'String cmd',
         'List<String> args',
@@ -34,18 +33,13 @@ class RunSilentExternalDeclarationProcessor
   List<Signature> signatures() => _signatures.values.expand((e) => e).toList();
 
   @override
-  String implementationFor(FunctionDeclaration declaration) {
-    final entry = _signatures.entries
-        .where(
-          (entry) =>
-              entry.value.any((signature) => signature.matches(declaration)),
-        )
-        .first;
-    final returnType = entry.key == ReturnType.stdout
+  String implementationForSignature(Signature signature) {
+    final returnType = ReturnType.of(signature.returnType);
+    final returnStatement = returnType == ReturnType.stdout
         ? 'systemEncoding.decode(stdoutBytes)'
         : '(systemEncoding.decode(stdoutBytes), systemEncoding.decode(stderrBytes))';
 
-    return '''Future<String> runSilent(String cmd, [List<String> args = const []]) async {
+    return '''${returnType.signature} ${signature.name}(String cmd, [List<String> args = const []]) async {
   final process = await Process.start(cmd, args);
   final stdoutBytes = <int>[];
   final stderrBytes = <int>[];
@@ -65,7 +59,7 @@ class RunSilentExternalDeclarationProcessor
     throw ProcessException(cmd, args, systemEncoding.decode(stderrBytes), exitCode);
   }
 
-  return $returnType;
+  return $returnStatement;
 }''';
   }
 }

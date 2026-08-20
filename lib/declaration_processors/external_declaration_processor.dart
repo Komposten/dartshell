@@ -13,13 +13,30 @@ abstract class ExternalDeclarationProcessor {
 
   List<Signature> signatures();
 
+  @nonVirtual
+  Signature? signature(FunctionDeclaration declaration) => signatures()
+      .where((signature) => signature.matches(declaration))
+      .firstOrNull;
+
   /// Whether this processor owns [declaration]'s signature.
   @nonVirtual
   bool supports(FunctionDeclaration declaration) =>
-      signatures().any((signature) => signature.matches(declaration));
+      signature(declaration) != null;
 
   /// The implementation that replaces [declaration].
-  String implementationFor(FunctionDeclaration declaration);
+  @nonVirtual
+  String implementationFor(FunctionDeclaration declaration) {
+    final s = signature(declaration);
+
+    if (s != null) {
+      return implementationForSignature(s);
+    }
+    throw ArgumentError('$runtimeType does not support $declaration');
+  }
+
+  /// The implementation that replaces [signature].
+  @protected
+  String implementationForSignature(Signature signature);
 }
 
 class Signature {
