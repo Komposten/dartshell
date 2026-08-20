@@ -5,13 +5,13 @@ import 'package:dartshell/declaration_processors/run_external_declaration_proces
 import 'package:test/test.dart';
 
 void main() {
-  group('ExternalDeclarationProcessor', () {
+  group('RunExternalDeclarationProcessor', () {
     const processor = RunExternalDeclarationProcessor();
 
     test('uses the matched signature to generate an implementation', () {
       final declaration = _externalFunctionDeclaration(
         'external Future<(String, String)> run('
-        'String cmd, [List<String> args]);',
+        'String cmd, [List<String> args, String stdin]);',
       );
 
       final signature = processor.signature(declaration);
@@ -24,8 +24,10 @@ void main() {
         allOf(
           startsWith(
             'Future<(String, String)> run('
-            'String cmd, [List<String> args = const []]) async',
+            "String cmd, [List<String> args = const [], String stdin = '']) async",
           ),
+          contains('process.stdin.write(stdin);'),
+          contains('await process.stdin.close();'),
           contains(
             'return (systemEncoding.decode(stdoutBytes), '
             'systemEncoding.decode(stderrBytes));',

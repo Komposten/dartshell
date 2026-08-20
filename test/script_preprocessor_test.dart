@@ -9,7 +9,7 @@ void main() {
   print(output);
 }
 
-external Future<String> run(String cmd, [List<String> args]);
+external Future<String> run(String cmd, [List<String> args, String stdin]);
 ''';
 
       final output = ScriptPreprocessor().preprocess(source);
@@ -18,7 +18,7 @@ external Future<String> run(String cmd, [List<String> args]);
       expect(
         output,
         contains(
-          'Future<String> run(String cmd, [List<String> args = const []]) async',
+          "Future<String> run(String cmd, [List<String> args = const [], String stdin = '']) async",
         ),
       );
       expect(
@@ -32,13 +32,11 @@ external Future<String> run(String cmd, [List<String> args]);
 
     test('implements record-returning run declarations', () {
       const source = '''external Future<(String, String)> run(
-  String cmd,
-  [List<String> args]
+  String cmd, [List<String> args, String stdin]
 );
 
 external Future<(String, String)> runSilent(
-  String cmd,
-  [List<String> args]
+  String cmd, [List<String> args, String stdin]
 );
 ''';
 
@@ -48,14 +46,14 @@ external Future<(String, String)> runSilent(
         output,
         contains(
           'Future<(String, String)> run(String cmd, '
-          '[List<String> args = const []]) async',
+          "[List<String> args = const [], String stdin = '']) async",
         ),
       );
       expect(
         output,
         contains(
           'Future<(String, String)> runSilent(String cmd, '
-          '[List<String> args = const []]) async',
+          "[List<String> args = const [], String stdin = '']) async",
         ),
       );
       expect(
@@ -71,7 +69,7 @@ external Future<(String, String)> runSilent(
     test('does not add dart:io when it is already imported', () {
       const source = '''import 'dart:io';
 
-external Future<String> run(String cmd, List<String> args);
+external Future<String> run(String cmd, List<String> args, String stdin);
 ''';
 
       final output = ScriptPreprocessor().preprocess(source);

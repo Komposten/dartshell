@@ -49,7 +49,7 @@ void main(List<String> args) async {
   }
 }
 
-external Future<String> run(String cmd, [List<String> args]);
+external Future<String> run(String cmd, [List<String> args, String stdin]);
 ```
 
 Execute it like any executable:

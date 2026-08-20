@@ -42,41 +42,39 @@ abstract class ExternalDeclarationProcessor {
 class Signature {
   final String returnType;
   final String name;
-  final String? requiredParameters;
-  final String? positionalParameters;
-  final String? namedParameters;
+  final List<String> _requiredParameters;
+  final List<String> _positionalParameters;
+  final List<String> _namedParameters;
   late final String parameterList;
   late final List<String> _compactParameterLists;
 
-  Signature(String returnType, String name, String? requiredParameters)
-    : this._(returnType, name, requiredParameters, null, null);
+  Signature(String returnType, String name, List<String> requiredParameters)
+    : this._(returnType, name, requiredParameters, [], []);
 
   Signature.withPositional(
     String returnType,
     String name,
-    String? requiredParameters,
-    String? positionalParameters,
-  ) : this._(returnType, name, requiredParameters, positionalParameters, null);
+    List<String> requiredParameters,
+    List<String> positionalParameters,
+  ) : this._(returnType, name, requiredParameters, positionalParameters, []);
 
   Signature.withNamed(
     String returnType,
     String name,
-    String? requiredParameters,
-    String? namedParameters,
-  ) : this._(returnType, name, requiredParameters, null, namedParameters);
+    List<String> requiredParameters,
+    List<String> namedParameters,
+  ) : this._(returnType, name, requiredParameters, [], namedParameters);
 
   Signature._(
     this.returnType,
     this.name,
-    this.requiredParameters,
-    this.positionalParameters,
-    this.namedParameters,
+    this._requiredParameters,
+    this._positionalParameters,
+    this._namedParameters,
   ) {
-    final bool hasRequired = requiredParameters != null;
-    final bool hasPositional = positionalParameters != null;
-    final bool hasNamed = namedParameters != null;
+    final bool hasRequired = _requiredParameters.isNotEmpty;
 
-    if (hasPositional && hasNamed) {
+    if (hasPositionalParameters && hasNamedParameters) {
       throw ArgumentError(
         'Both positional and named parameters cannot be specified',
       );
@@ -84,23 +82,56 @@ class Signature {
 
     List<String> parameterLists;
 
+    final optional = optionalParameterList();
     if (hasRequired) {
       parameterLists = [
-        if (hasPositional) '($requiredParameters, [$positionalParameters])',
-        if (hasNamed) '($requiredParameters, {$namedParameters})',
-        '($requiredParameters)',
+        if (optional != null) '($requiredParameterList, $optional)',
+        '($requiredParameterList)',
       ];
     } else {
-      parameterLists = [
-        if (hasPositional) '([$positionalParameters])',
-        if (hasNamed) '({$namedParameters})',
-        '',
-      ];
+      parameterLists = [if (optional != null) '($optional)', '()'];
     }
 
     parameterList = parameterLists.first;
     _compactParameterLists = parameterLists.map(_compact).toList();
   }
+
+  bool get hasPositionalParameters => _positionalParameters.isNotEmpty;
+  bool get hasNamedParameters => _namedParameters.isNotEmpty;
+
+  String get requiredParameterList => _requiredParameters.join(', ');
+  String positionalParameterList({bool withDefaults = false}) =>
+      '[${(withDefaults ? _addDefaults(_positionalParameters) : _positionalParameters).join(', ')}]';
+  String namedParameterList({bool withDefaults = false}) =>
+      '{${(withDefaults ? _addDefaults(_namedParameters) : _namedParameters).join(', ')}}';
+
+  String? optionalParameterList({bool withDefaults = false}) =>
+      hasPositionalParameters
+      ? positionalParameterList(withDefaults: withDefaults)
+      : hasNamedParameters
+      ? namedParameterList(withDefaults: withDefaults)
+      : null;
+
+  static const _parameterDefaults = [
+    (pattern: 'List<', defaultValue: 'const []'),
+    (pattern: 'Map<', defaultValue: 'const {}'),
+    (pattern: 'Set<', defaultValue: 'const {}'),
+    (pattern: 'String ', defaultValue: "''"),
+  ];
+
+  Iterable<String> _addDefaults(Iterable<String> parameters) => parameters.map((
+    parameter,
+  ) {
+    final value = _parameterDefaults
+        .where((entry) => parameter.startsWith(entry.pattern))
+        .firstOrNull
+        ?.defaultValue;
+    if (value != null) {
+      return '$parameter = $value';
+    } else {
+      throw ArgumentError('No default declared for parameter type: $parameter');
+    }
+  });
 
   bool matches(FunctionDeclaration declaration) =>
       declaration.returnType?.toSource() == returnType &&
