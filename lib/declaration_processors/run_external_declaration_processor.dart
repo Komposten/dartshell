@@ -11,16 +11,18 @@ import 'external_declaration_processor.dart';
 /// ```
 class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   static final _signatures = [
-    Signature(ReturnType.stdout.signature, 'run', [
-      'String cmd',
-      'List<String> args',
-      'String stdin',
-    ]),
-    Signature(ReturnType.stdoutStderr.signature, 'run', [
-      'String cmd',
-      'List<String> args',
-      'String stdin',
-    ]),
+    Signature(
+      ReturnType.stdout.signature,
+      'run',
+      ['String cmd'],
+      ['List<String> args', 'String stdin'],
+    ),
+    Signature(
+      ReturnType.stdoutStderr.signature,
+      'run',
+      ['String cmd'],
+      ['List<String> args', 'String stdin'],
+    ),
   ];
 
   const RunExternalDeclarationProcessor() : super(true);

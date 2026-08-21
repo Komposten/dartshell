@@ -80,17 +80,19 @@ You can obtain a list of Dartshell's supported `external` functions using `darts
 These function signatures are very flexible.
 
 You may:
-- Omit parameters you do not need
-- Decide for each parameter whether it should be required or optional, as well as positional or named
+- Omit optional parameters you do not need
+- Decide for each optional parameter whether it should be required or optional, as well as positional or named
+- Change the required positional parameters to required named parameters.
 - Add your own default values for optional parameters, or let Dartshell decide (it will use "empty" values: empty string, empty list, etc.).
 
 You may not:
 - Change the function and parameter names, the parameter types or the return type.
+- Omit the required positional parameters.
 
 Here are a few examples of this flexibility:
 ```dart
 // Original signature from `dartshell --signatures` or `dartshell --new`
-external Future<String> run(String cmd, List<String> args, String stdin, bool silent);
+external Future<String> run(String cmd, [List<String> args, String stdin, bool silent]);
 
 // Examples of variants you could use:
 external Future<String> run(String cmd);
@@ -98,6 +100,7 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
 external Future<String> run(String cmd, List<String> args, {String stdin, bool silent = true});
 external Future<String> run(String cmd, List<String> args, {required String stdin});
 external Future<String> run(String cmd, String stdin, [List<String> args]);
+external Future<String> run({required String cmd, required List<String> args});
 ```
 
 

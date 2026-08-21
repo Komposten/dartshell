@@ -12,7 +12,8 @@ class ResolvedParameters {
   final List<Parameter> positional;
   final List<Parameter> named;
 
-  List<Parameter> get all => [...required, ...positional, ...named];
+  Iterable<Parameter> get all =>
+      required.followedBy(positional).followedBy(named);
 
   ResolvedParameters._(this.required, this.positional, this.named);
 

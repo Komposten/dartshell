@@ -8,16 +8,18 @@ import 'external_declaration_processor.dart';
 class RunSilentExternalDeclarationProcessor
     extends ExternalDeclarationProcessor {
   static final _signatures = [
-    Signature(ReturnType.stdout.signature, 'runSilent', [
-      'String cmd',
-      'List<String> args',
-      'String stdin',
-    ]),
-    Signature(ReturnType.stdoutStderr.signature, 'runSilent', [
-      'String cmd',
-      'List<String> args',
-      'String stdin',
-    ]),
+    Signature(
+      ReturnType.stdout.signature,
+      'runSilent',
+      ['String cmd'],
+      ['List<String> args', 'String stdin'],
+    ),
+    Signature(
+      ReturnType.stdoutStderr.signature,
+      'runSilent',
+      ['String cmd'],
+      ['List<String> args', 'String stdin'],
+    ),
   ];
 
   const RunSilentExternalDeclarationProcessor() : super(true);

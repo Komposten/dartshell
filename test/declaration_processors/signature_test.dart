@@ -8,9 +8,17 @@ import 'package:test/test.dart';
 void main() {
   group('Signature', () {
     test('formats a signature', () {
-      final signature = Signature('Future<String>', 'run', ['String cmd']);
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args'],
+      );
 
-      expect(signature.toString(), 'Future<String> run(String cmd)');
+      expect(
+        signature.toString(),
+        'Future<String> run(String cmd, [List<String> args])',
+      );
     });
 
     test('matches a required-only function declaration', () {
@@ -27,11 +35,12 @@ void main() {
     });
 
     test('matches functions with optional positional arguments', () {
-      final signature = Signature('Future<String>', 'run', [
-        'String cmd',
-        'List<String> args',
-        'String stdin',
-      ]);
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args', 'String stdin'],
+      );
 
       expect(
         signature.matches(
@@ -45,11 +54,12 @@ void main() {
     });
 
     test('matches functions with named arguments', () {
-      final signature = Signature('Future<String>', 'run', [
-        'String cmd',
-        'List<String> args',
-        'String stdin',
-      ]);
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args', 'String stdin'],
+      );
 
       expect(
         signature.matches(
@@ -62,12 +72,13 @@ void main() {
       );
     });
 
-    test('matches functions with some arguments omitted', () {
-      final signature = Signature('Future<String>', 'run', [
-        'String cmd',
-        'List<String> args',
-        'String stdin',
-      ]);
+    test('matches functions with optional arguments omitted', () {
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args', 'String stdin'],
+      );
 
       expect(
         signature.matches(
@@ -80,11 +91,12 @@ void main() {
     });
 
     test('matches functions with rearranged arguments', () {
-      final signature = Signature('Future<String>', 'run', [
-        'String cmd',
-        'List<String> args',
-        'String stdin',
-      ]);
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd', 'List<String> args'],
+        ['String stdin'],
+      );
 
       expect(
         signature.matches(
@@ -93,6 +105,53 @@ void main() {
           ),
         ),
         isTrue,
+      );
+    });
+
+    test('matches functions with required arguments as named', () {
+      final signature = Signature('Future<String>', 'run', ['String cmd']);
+
+      expect(
+        signature.matches(
+          _externalFunctionDeclaration(
+            'external Future<String> run({required String cmd});',
+          ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not match declarations with missing required parameters', () {
+      final signature = Signature('Future<String>', 'run', [
+        'String cmd',
+        'List<String> args',
+      ]);
+
+      expect(
+        signature.matches(
+          _externalFunctionDeclaration(
+            'external Future<String> run(String cmd);',
+          ),
+        ),
+        isFalse,
+      );
+
+      expect(
+        signature.matches(
+          _externalFunctionDeclaration(
+            'external Future<String> run(String cmd, [List<String> args]);',
+          ),
+        ),
+        isFalse,
+      );
+
+      expect(
+        signature.matches(
+          _externalFunctionDeclaration(
+            'external Future<String> run(String cmd, {List<String> args});',
+          ),
+        ),
+        isFalse,
       );
     });
 
@@ -129,11 +188,12 @@ void main() {
     );
 
     test('parameterStringFor adds missing parameters as optional', () {
-      final signature = Signature('Future<String>', 'run', [
-        'String cmd',
-        'List<String> args',
-        'String stdin',
-      ]);
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args', 'String stdin'],
+      );
       final function1 = _externalFunctionDeclaration(
         'external Future<String> run(String cmd);',
       );
