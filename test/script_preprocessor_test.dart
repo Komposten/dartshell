@@ -9,7 +9,7 @@ void main() {
   print(output);
 }
 
-external Future<String> run(String cmd, [List<String> args, String stdin]);
+external Future<String> run(String cmd, [List<String> args, String stdin, bool silent]);
 ''';
 
       final output = ScriptPreprocessor().preprocess(source);
@@ -18,7 +18,7 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
       expect(
         output,
         contains(
-          "Future<String> run(String cmd, [List<String> args = const [], String stdin = '']) async",
+          "Future<String> run(String cmd, [List<String> args = const [], String stdin = '', bool silent = false]) async",
         ),
       );
       expect(
@@ -40,7 +40,7 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
         output,
         contains(
           'Future<String> run({required String cmd, '
-          "List<String> args = const [], String stdin = ''}) async",
+          "List<String> args = const [], String stdin = '', bool silent = false}) async",
         ),
       );
       expect(output, isNot(contains('external Future<String> run')));
@@ -59,7 +59,7 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
         output,
         contains(
           'Future<String> run(String cmd, List<String> args, '
-          "[String stdin = '']) async",
+          "[String stdin = '', bool silent = false]) async",
         ),
       );
       expect(output, isNot(contains('external Future<String> run')));
@@ -78,7 +78,7 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
         output,
         contains(
           'Future<String> run(String cmd, {'
-          "String stdin = '', List<String> args = const []}) async",
+          "String stdin = '', List<String> args = const [], bool silent = false}) async",
         ),
       );
       expect(output, isNot(contains('external Future<String> run')));
@@ -86,10 +86,6 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
 
     test('implements record-returning run declarations', () {
       const source = '''external Future<(String, String)> run(
-  String cmd, [List<String> args, String stdin]
-);
-
-external Future<(String, String)> runSilent(
   String cmd, [List<String> args, String stdin]
 );
 ''';
@@ -100,14 +96,7 @@ external Future<(String, String)> runSilent(
         output,
         contains(
           'Future<(String, String)> run(String cmd, '
-          "[List<String> args = const [], String stdin = '']) async",
-        ),
-      );
-      expect(
-        output,
-        contains(
-          'Future<(String, String)> runSilent(String cmd, '
-          "[List<String> args = const [], String stdin = '']) async",
+          "[List<String> args = const [], String stdin = '', bool silent = false]) async",
         ),
       );
       expect(
@@ -115,7 +104,7 @@ external Future<(String, String)> runSilent(
           r'return \(systemEncoding\.decode\(stdoutBytes\), '
           r'systemEncoding\.decode\(stderrBytes\)\);',
         ).allMatches(output),
-        hasLength(2),
+        hasLength(1),
       );
       expect(output, isNot(contains('external Future<(String, String)>')));
     });

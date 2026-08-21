@@ -9,15 +9,15 @@ void main() {
     test('groups every built-in signature by function name', () {
       final signaturesByName = availableExternalSignatures();
 
-      expect(signaturesByName.map((s) => s.name), ['run', 'runSilent']);
+      expect(signaturesByName.map((s) => s.name), ['run']);
       expect(
         signaturesByName
             .where((s) => s.name == 'run')
             .expand((e) => e.signatures)
             .map((signature) => signature.toString()),
         [
-          'Future<String> run(String cmd, [List<String> args, String stdin])',
-          'Future<(String, String)> run(String cmd, [List<String> args, String stdin])',
+          'Future<String> run(String cmd, [List<String> args, String stdin, bool silent])',
+          'Future<(String, String)> run(String cmd, [List<String> args, String stdin, bool silent])',
         ],
       );
     });

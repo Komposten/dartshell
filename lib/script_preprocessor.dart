@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:dartshell/declaration_processors/run_silent_external_declaration_processor.dart';
 
 import 'declaration_processors/external_declaration_processor.dart';
 import 'declaration_processors/run_external_declaration_processor.dart';
@@ -11,7 +10,6 @@ export 'declaration_processors/run_external_declaration_processor.dart';
 /// The processors available to Dartshell scripts and CLI commands.
 const defaultExternalDeclarationProcessors = <ExternalDeclarationProcessor>[
   RunExternalDeclarationProcessor(),
-  RunSilentExternalDeclarationProcessor(),
 ];
 
 /// Transforms supported external declarations in a Dart script into their

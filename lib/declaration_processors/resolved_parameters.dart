@@ -92,6 +92,7 @@ class ResolvedParameters {
     (pattern: 'Map<', defaultValue: 'const {}'),
     (pattern: 'Set<', defaultValue: 'const {}'),
     (pattern: 'String ', defaultValue: "''"),
+    (pattern: 'bool ', defaultValue: 'false'),
   ];
 
   static String addDefault(String parameter) {

@@ -7,7 +7,7 @@ import 'external_declaration_processor.dart';
 /// Implements the shell command declaration:
 ///
 /// ```dart
-/// external Future<String> run(String cmd, [List<String> args]);
+/// external Future<String> run(String cmd, [List<String> args, String stdin, bool silent]);
 /// ```
 class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   static final _signatures = [
@@ -15,13 +15,13 @@ class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
       ReturnType.stdout.signature,
       'run',
       ['String cmd'],
-      ['List<String> args', 'String stdin'],
+      ['List<String> args', 'String stdin', 'bool silent'],
     ),
     Signature(
       ReturnType.stdoutStderr.signature,
       'run',
       ['String cmd'],
-      ['List<String> args', 'String stdin'],
+      ['List<String> args', 'String stdin', 'bool silent'],
     ),
   ];
 
@@ -50,7 +50,9 @@ class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   final stderrBytes = <int>[];
 
   final stdoutDone = process.stdout.listen((output) {
-    stdout.add(output);
+    if (!silent) {
+      stdout.add(output);
+    }
     stdoutBytes.addAll(output);
   }).asFuture<void>();
   final stderrDone = process.stderr.listen((output) {
