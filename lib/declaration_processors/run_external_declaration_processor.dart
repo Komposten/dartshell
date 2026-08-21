@@ -28,8 +28,12 @@ class RunExternalDeclarationProcessor extends ExternalDeclarationProcessor {
   const RunExternalDeclarationProcessor() : super(true);
 
   @override
-  String get description =>
-      "Run the specified command. The command's stdout and stderr are echoed. The return value contains stdout (and stderr, for the record version).";
+  String get description => '''
+Runs a command with the supplied arguments.
+By default, its output is forwarded to this process's stdout and stderr. Set `silent` to suppress stdout; stderr is still forwarded.
+Pass `stdin` to provide input to the command.
+The returned future completes with stdout, or with a record containing both stdout and stderr.
+''';
 
   @override
   List<Signature> signatures() => _signatures;

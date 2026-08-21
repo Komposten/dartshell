@@ -171,8 +171,10 @@ void main(List<String> args) async {
   // You may use all available Dart features.
 }
 
-// Dartshell function declarations; uncomment the ones you need
-//   You may omit parameters you don't need, change the parameter order, and change if each parameter is required/optional and positional/named.
+// Dartshell function declarations
+// Uncomment the signatures you need. You may omit optional parameters, change
+// the parameter order, and choose whether each parameter is required, optional,
+// positional, or named.
 ''');
 
   for (final line in _availableSignatureLines()) {
@@ -184,18 +186,46 @@ void main(List<String> args) async {
 
 void _printAvailableSignatures() {
   print(
-    "Important: You may omit parameters you don't need, change the parameter order, and change if each parameter is required/optional and positional/named.",
+    "Important: You You may omit optional parameters, change the parameter order, and choose whether each parameter is required, optional, positional, or named.",
   );
 
-  for (final line in _availableSignatureLines()) {
-    print(line.startsWith('external ') ? '  $line' : line);
+  for (final entry in core.availableExternalSignatures()) {
+    print('');
+    print('${_Ansi.header}${entry.name}${_Ansi.reset}');
+    print('${_Ansi.dim}${'─' * entry.name.length}${_Ansi.reset}');
+    for (final line in _descriptionLines(entry.description)) {
+      print(line);
+    }
+    print('');
+    print('${_Ansi.label}Signatures:${_Ansi.reset}');
+    for (final signature in entry.signatures) {
+      print(
+        '  ${_Ansi.keyword}external${_Ansi.reset} '
+        '${signature.toString(highlighted: true)}${_Ansi.dim};${_Ansi.reset}',
+      );
+    }
   }
 }
+
+abstract final class _Ansi {
+  static const reset = '\x1B[0m';
+  static const dim = '\x1B[2m';
+  static const header = '\x1B[1;36m';
+  static const label = '\x1B[1m';
+  static const keyword = '\x1B[35m';
+}
+
+Iterable<String> _descriptionLines(String description) =>
+    description.trim().split('\n').map((line) => line.trim());
 
 List<String> _availableSignatureLines() => [
   for (final entry in core.availableExternalSignatures()) ...[
     '',
-    '${entry.name}: ${entry.description}',
-    for (final signature in entry.signatures) 'external $signature;',
+    entry.name,
+    '─' * entry.name.length,
+    ..._descriptionLines(entry.description),
+    '',
+    'Signatures:',
+    for (final signature in entry.signatures) '  external $signature;',
   ],
 ];

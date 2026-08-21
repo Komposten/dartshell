@@ -23,6 +23,34 @@ void main() {
     });
   });
 
+  group('dartshell --signatures', () {
+    test('prints a structured, syntax-highlighted signature list', () async {
+      final result = await _runDartshell(['--signatures']);
+
+      expect(result.exitCode, 0, reason: result.stderr);
+      expect(
+        result.stdout,
+        contains('\x1B[1;36mrun\x1B[0m\n\x1B[2m───\x1B[0m'),
+      );
+      expect(
+        result.stdout,
+        contains(
+          'Runs a command with the supplied arguments.\n'
+          'By default, its output is forwarded to this process\'s stdout and stderr. '
+          'Set `silent` to suppress stdout; stderr is still forwarded.',
+        ),
+      );
+      expect(result.stdout, contains('\x1B[1mSignatures:\x1B[0m'));
+      expect(
+        result.stdout,
+        contains(
+          '  \x1B[35mexternal\x1B[0m '
+          '\x1B[36mFuture<String>\x1B[0m \x1B[32mrun\x1B[0m',
+        ),
+      );
+    });
+  });
+
   group('dartshell --new', () {
     late Directory scriptDirectory;
 
@@ -54,13 +82,22 @@ void main(List<String> args) async {
   // You may use all available Dart features.
 }
 
-// Dartshell function declarations; uncomment the ones you need
+// Dartshell function declarations
+// Uncomment the signatures you need. You may omit optional parameters, change
+// the parameter order, and choose whether each parameter is required, optional,
+// positional, or named.
 '''),
         );
         for (final entry in availableExternalSignatures()) {
-          expect(script, contains('// ${entry.name}: ${entry.description}'));
+          expect(
+            script,
+            contains('// ${entry.name}\n// ${'─' * entry.name.length}'),
+          );
+          for (final line in entry.description.trim().split('\n')) {
+            expect(script, contains('// ${line.trim()}'));
+          }
           for (final signature in entry.signatures) {
-            expect(script, contains('// external $signature;'));
+            expect(script, contains('//   external $signature;'));
           }
         }
       },

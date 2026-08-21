@@ -96,11 +96,33 @@ class Signature {
   }
 
   @override
-  String toString() {
+  String toString({bool highlighted = false}) {
     final optionalParameters = _optionalParameters.isNotEmpty
-        ? ', [${_optionalParameters.join(', ')}]'
+        ? '${_format(', [', _Ansi.dim, highlighted)}'
+              '${_format(_optionalParameters.join(', '), _Ansi.parameter, highlighted)}'
+              '${_format(']', _Ansi.dim, highlighted)}'
         : '';
-    final requiredParameters = _requiredParameters.join(', ');
-    return '$returnType $name($requiredParameters$optionalParameters)';
+    final requiredParameters = _format(
+      _requiredParameters.join(', '),
+      _Ansi.parameter,
+      highlighted,
+    );
+    return '${_format(returnType, _Ansi.returnType, highlighted)} '
+        '${_format(name, _Ansi.function, highlighted)}'
+        '${_format('(', _Ansi.dim, highlighted)}'
+        '$requiredParameters'
+        '$optionalParameters'
+        '${_format(')', _Ansi.dim, highlighted)}';
   }
+
+  static String _format(String value, String color, bool highlighted) =>
+      highlighted ? '$color$value${_Ansi.reset}' : value;
+}
+
+abstract final class _Ansi {
+  static const reset = '\x1B[0m';
+  static const dim = '\x1B[2m';
+  static const returnType = '\x1B[36m';
+  static const function = '\x1B[32m';
+  static const parameter = '\x1B[33m';
 }

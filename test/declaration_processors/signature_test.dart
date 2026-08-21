@@ -21,6 +21,23 @@ void main() {
       );
     });
 
+    test('formats a signature with ANSI syntax highlighting', () {
+      final signature = Signature(
+        'Future<String>',
+        'run',
+        ['String cmd'],
+        ['List<String> args'],
+      );
+
+      expect(
+        signature.toString(highlighted: true),
+        '\x1B[36mFuture<String>\x1B[0m \x1B[32mrun\x1B[0m'
+        '\x1B[2m(\x1B[0m\x1B[33mString cmd\x1B[0m'
+        '\x1B[2m, [\x1B[0m\x1B[33mList<String> args\x1B[0m'
+        '\x1B[2m]\x1B[0m\x1B[2m)\x1B[0m',
+      );
+    });
+
     test('matches a required-only function declaration', () {
       final signature = Signature('Future<String>', 'run', ['String cmd']);
 
