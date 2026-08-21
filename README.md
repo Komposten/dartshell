@@ -71,11 +71,38 @@ chmod +x check_changes.dart
    }
    ```
    In this case you have to manually define the `external` functions you want to use.\
-   Run `dartshell --signatures` to get a complete list of supported signatures.
+   Run `dartshell --signatures` to get a list of supported functions.
 3. Add your script code, calling the `external` functions like any normal Dart functions.
 
+### External function declarations
+You can obtain a list of Dartshell's supported `external` functions using `dartshell --signatures` or `dartshell --new`.
+
+These function signatures are very flexible.
+
+You may:
+- Omit parameters you do not need
+- Decide for each parameter whether it should be required or optional, as well as positional or named
+- Add your own default values for optional parameters, or let Dartshell decide (it will use "empty" values: empty string, empty list, etc.).
+
+You may not:
+- Change the function and parameter names, the parameter types or the return type.
+
+Here are a few examples of this flexibility:
+```dart
+// Original signature from `dartshell --signatures` or `dartshell --new`
+external Future<String> run(String cmd, List<String> args, String stdin, bool silent);
+
+// Examples of variants you could use:
+external Future<String> run(String cmd);
+external Future<String> run(String cmd, [List<String> args, String stdin]);
+external Future<String> run(String cmd, List<String> args, {String stdin, bool silent = true});
+external Future<String> run(String cmd, List<String> args, {required String stdin});
+external Future<String> run(String cmd, String stdin, [List<String> args]);
+```
+
+
 ## How it works
-On its first run, Dartshell expands the `external` declaration, compiles the expanded script, and executes the resulting binary.
+On its first run, Dartshell expands the `external` declarations, compiles the expanded script, and executes the resulting binary.
 Subsequent runs reuse the binary until the source script changes, ensuring consistent performance after the first run.
 
 ### Technical details

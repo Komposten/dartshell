@@ -172,6 +172,7 @@ void main(List<String> args) async {
 }
 
 // Dartshell function declarations; uncomment the ones you need
+//   You may omit parameters you don't need, change the parameter order, and change if each parameter is required/optional and positional/named.
 ''');
 
   for (final line in _availableSignatureLines()) {
@@ -183,7 +184,7 @@ void main(List<String> args) async {
 
 void _printAvailableSignatures() {
   print(
-    'Note: optional positional or named parameters may be omitted from the signature.',
+    "Important: You may omit parameters you don't need, change the parameter order, and change if each parameter is required/optional and positional/named.",
   );
 
   for (final line in _availableSignatureLines()) {

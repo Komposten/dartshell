@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dartshell/bool_extensions.dart';
+import 'package:dartshell/declaration_processors/signature.dart';
 import 'package:dartshell/script_preprocessor.dart';
 import 'package:path/path.dart' as path;
 
