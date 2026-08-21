@@ -1,29 +1,20 @@
+import 'package:dartshell/declaration_processors/resolved_parameters.dart';
 import 'package:dartshell/declaration_processors/return_type.dart';
+import 'package:dartshell/declaration_processors/signature.dart';
 
 import 'external_declaration_processor.dart';
 
+// TODO Fold this into RunExternalDeclarationProcessor
 class RunSilentExternalDeclarationProcessor
     extends ExternalDeclarationProcessor {
   static final _signatures = [
-    Signature.withPositional(
+    Signature(
       ReturnType.stdout.signature,
       'runSilent',
       ['String cmd'],
       ['List<String> args', 'String stdin'],
     ),
-    Signature.withNamed(
-      ReturnType.stdout.signature,
-      'runSilent',
-      ['String cmd'],
-      ['List<String> args', 'String stdin'],
-    ),
-    Signature.withPositional(
-      ReturnType.stdoutStderr.signature,
-      'runSilent',
-      ['String cmd'],
-      ['List<String> args', 'String stdin'],
-    ),
-    Signature.withNamed(
+    Signature(
       ReturnType.stdoutStderr.signature,
       'runSilent',
       ['String cmd'],
@@ -41,14 +32,16 @@ class RunSilentExternalDeclarationProcessor
   List<Signature> signatures() => _signatures;
 
   @override
-  String implementationForSignature(Signature signature) {
+  String implementationForSignature(
+    Signature signature,
+    ResolvedParameters parameters,
+  ) {
     final returnType = ReturnType.of(signature.returnType);
     final returnStatement = returnType == ReturnType.stdout
         ? 'systemEncoding.decode(stdoutBytes)'
         : '(systemEncoding.decode(stdoutBytes), systemEncoding.decode(stderrBytes))';
-    final optionalParams = signature.optionalParameterList(withDefaults: true)!;
 
-    return '''${returnType.signature} ${signature.name}(String cmd, $optionalParams) async {
+    return '''${returnType.signature} ${signature.name}(${signature.parameterStringFor(parameters)}) async {
   final process = await Process.start(cmd, args);
   final stdoutBytes = <int>[];
   final stderrBytes = <int>[];

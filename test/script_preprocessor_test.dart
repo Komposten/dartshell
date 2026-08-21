@@ -30,6 +30,60 @@ external Future<String> run(String cmd, [List<String> args, String stdin]);
       expect(output, isNot(contains('external Future<String> run')));
     });
 
+    test('implements a declaration with a required named command', () {
+      const source = '''external Future<String> run({required String cmd});
+''';
+
+      final output = ScriptPreprocessor().preprocess(source);
+
+      expect(
+        output,
+        contains(
+          'Future<String> run({required String cmd, '
+          "List<String> args = const [], String stdin = ''}) async",
+        ),
+      );
+      expect(output, isNot(contains('external Future<String> run')));
+    });
+
+    test('implements a declaration that promotes args to required', () {
+      const source = '''external Future<String> run(
+  String cmd,
+  List<String> args,
+);
+''';
+
+      final output = ScriptPreprocessor().preprocess(source);
+
+      expect(
+        output,
+        contains(
+          'Future<String> run(String cmd, List<String> args, '
+          "[String stdin = '']) async",
+        ),
+      );
+      expect(output, isNot(contains('external Future<String> run')));
+    });
+
+    test('implements a declaration with a named optional stdin', () {
+      const source = '''external Future<String> run(
+  String cmd, {
+  String stdin,
+});
+''';
+
+      final output = ScriptPreprocessor().preprocess(source);
+
+      expect(
+        output,
+        contains(
+          'Future<String> run(String cmd, {'
+          "String stdin = '', List<String> args = const []}) async",
+        ),
+      );
+      expect(output, isNot(contains('external Future<String> run')));
+    });
+
     test('implements record-returning run declarations', () {
       const source = '''external Future<(String, String)> run(
   String cmd, [List<String> args, String stdin]

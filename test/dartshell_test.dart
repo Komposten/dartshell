@@ -17,9 +17,7 @@ void main() {
             .map((signature) => signature.toString()),
         [
           'Future<String> run(String cmd, [List<String> args, String stdin])',
-          'Future<String> run(String cmd, {List<String> args, String stdin})',
           'Future<(String, String)> run(String cmd, [List<String> args, String stdin])',
-          'Future<(String, String)> run(String cmd, {List<String> args, String stdin})',
         ],
       );
     });
